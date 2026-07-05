@@ -50,10 +50,7 @@
             <div class="content-area">
                 <h3 class="mb-4 pb-2 border-bottom" style="color: #334155; font-weight:bold;">Student Fingerprint Enrollment</h3>
                 
-                @if (TempData["SuccessMessage"] != null)
-                {
-                    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
-                }
+                <!-- Alerts handled by SweetAlert -->
 
                 <form asp-action="Enrollment" method="post" class="bg-white p-4 shadow-sm" style="max-width: 800px;">
                     <div class="d-flex">
@@ -103,5 +100,6 @@
             </div>
         </div>
     </div>
+    <partial name="_ToastNotifications" />
 </body>
 </html>

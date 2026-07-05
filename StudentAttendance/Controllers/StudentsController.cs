@@ -36,11 +36,24 @@ public class StudentsController : Controller
         return View(model);
     }
 
-    [HttpGet]
-    public IActionResult Create()
+    private async Task PopulateAvailableCoursesAsync(StudentFormViewModel model)
     {
+        model.AvailableCourses = await _context.Courses
+            .Select(c => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem
+            {
+                Value = c.Id.ToString(),
+                Text = c.CourseCode + " - " + c.CourseName
+            })
+            .ToListAsync();
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Create()
+    {
+        var model = new StudentFormViewModel();
+        await PopulateAvailableCoursesAsync(model);
         ViewData["Action"] = "Create";
-        return View("Form", new StudentFormViewModel());
+        return View("Form", model);
     }
 
     [HttpPost]
@@ -49,6 +62,7 @@ public class StudentsController : Controller
     {
         if (!ModelState.IsValid)
         {
+            await PopulateAvailableCoursesAsync(model);
             ViewData["Action"] = "Create";
             return View("Form", model);
         }
@@ -72,6 +86,7 @@ public class StudentsController : Controller
         if (await _context.Students.AnyAsync(s => s.ExternalId == model.ExternalId))
         {
             ModelState.AddModelError("ExternalId", "This Student ID is already in use.");
+            await PopulateAvailableCoursesAsync(model);
             ViewData["Action"] = "Create";
             return View("Form", model);
         }
@@ -82,7 +97,8 @@ public class StudentsController : Controller
             FullName = model.FullName,
             Email = model.Email ?? string.Empty,
             Department = model.Department,
-            EnrollmentYear = model.EnrollmentYear
+            EnrollmentYear = model.EnrollmentYear,
+            Courses = await _context.Courses.Where(c => model.SelectedCourseIds.Contains(c.Id)).ToListAsync()
         };
 
         _context.Students.Add(student);
@@ -95,7 +111,10 @@ public class StudentsController : Controller
     [HttpGet]
     public async Task<IActionResult> Edit(int id)
     {
-        var student = await _context.Students.FindAsync(id);
+        var student = await _context.Students
+            .Include(s => s.Courses)
+            .FirstOrDefaultAsync(s => s.Id == id);
+            
         if (student == null) return NotFound();
 
         var model = new StudentFormViewModel
@@ -105,9 +124,11 @@ public class StudentsController : Controller
             FullName = student.FullName,
             Email = student.Email,
             Department = student.Department,
-            EnrollmentYear = student.EnrollmentYear
+            EnrollmentYear = student.EnrollmentYear,
+            SelectedCourseIds = student.Courses.Select(c => c.Id).ToList()
         };
 
+        await PopulateAvailableCoursesAsync(model);
         ViewData["Action"] = "Edit";
         return View("Form", model);
     }
@@ -120,11 +141,15 @@ public class StudentsController : Controller
 
         if (!ModelState.IsValid)
         {
+            await PopulateAvailableCoursesAsync(model);
             ViewData["Action"] = "Edit";
             return View("Form", model);
         }
 
-        var student = await _context.Students.FindAsync(id);
+        var student = await _context.Students
+            .Include(s => s.Courses)
+            .FirstOrDefaultAsync(s => s.Id == id);
+            
         if (student == null) return NotFound();
 
         // Auto-generate ExternalId if left blank during edit
@@ -146,6 +171,7 @@ public class StudentsController : Controller
         if (await _context.Students.AnyAsync(s => s.ExternalId == model.ExternalId && s.Id != id))
         {
             ModelState.AddModelError("ExternalId", "This Student ID is already in use by another student.");
+            await PopulateAvailableCoursesAsync(model);
             ViewData["Action"] = "Edit";
             return View("Form", model);
         }
@@ -155,6 +181,10 @@ public class StudentsController : Controller
         student.Email = model.Email ?? string.Empty;
         student.Department = model.Department;
         student.EnrollmentYear = model.EnrollmentYear;
+
+        student.Courses.Clear();
+        var selectedCourses = await _context.Courses.Where(c => model.SelectedCourseIds.Contains(c.Id)).ToListAsync();
+        foreach (var c in selectedCourses) student.Courses.Add(c);
 
         await _context.SaveChangesAsync();
 

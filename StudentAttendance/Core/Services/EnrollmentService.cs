@@ -17,63 +17,92 @@ public class EnrollmentService : IEnrollmentService
     private readonly ApplicationDbContext _dbContext;
     private readonly IEncryptionService _encryptionService;
     private readonly ILogger<EnrollmentService> _logger;
+    private readonly IAttendanceService _attendanceService;
 
     public EnrollmentService(
         ApplicationDbContext dbContext,
         IEncryptionService encryptionService,
-        ILogger<EnrollmentService> logger)
+        ILogger<EnrollmentService> logger,
+        IAttendanceService attendanceService)
     {
         _dbContext = dbContext;
         _encryptionService = encryptionService;
         _logger = logger;
+        _attendanceService = attendanceService;
     }
 
     public async Task<(bool success, string? errorMessage)> EnrollStudentAsync(EnrollmentViewModel model)
     {
-        // 1. Guard: ensure ExternalId is not already in use
-        bool alreadyExists = await _dbContext.Students
-            .AnyAsync(s => s.ExternalId == model.StudentIdString);
+        // 1. Check if the student already exists in the system
+        var existingStudent = await _dbContext.Students
+            .Include(s => s.Fingerprint)
+            .FirstOrDefaultAsync(s => s.ExternalId == model.StudentIdString);
 
-        if (alreadyExists)
+        Student studentToSave;
+
+        if (existingStudent != null)
         {
-            _logger.LogWarning("Enrollment rejected: ExternalId '{ExternalId}' is already registered.", model.StudentIdString);
-            return (false, $"A student with ID '{model.StudentIdString}' is already enrolled in the system.");
+            // We are attaching a fingerprint to an existing student
+            studentToSave = existingStudent;
+            // Optionally update basic info if the form had changes
+            studentToSave.FullName = model.FullName;
+            studentToSave.Department = model.Department;
+        }
+        else
+        {
+            // 2. We are creating a brand new student from scratch
+            int enrollmentYear = DateTime.UtcNow.Year;
+            var yearDigits = new string(model.Year.Where(char.IsDigit).ToArray());
+            if (yearDigits.Length > 0 && int.TryParse(yearDigits, out int parsedYear) && parsedYear >= 1 && parsedYear <= 10)
+            {
+                enrollmentYear = DateTime.UtcNow.Year;
+            }
+
+            studentToSave = new Student
+            {
+                ExternalId     = model.StudentIdString,
+                FullName       = model.FullName,
+                Department     = model.Department,
+                EnrollmentYear = enrollmentYear,
+                Email          = string.Empty, // Email not collected in the enrollment form currently
+                Courses        = await _dbContext.Courses.ToListAsync()
+            };
+
+            _dbContext.Students.Add(studentToSave);
         }
 
-        // 2. Parse the enrollment year — EnrollmentViewModel stores it as a string (e.g., "3rd Year")
-        // We extract the leading integer if present, otherwise store the current calendar year.
-        int enrollmentYear = DateTime.UtcNow.Year;
-        var yearDigits = new string(model.Year.Where(char.IsDigit).ToArray());
-        if (yearDigits.Length > 0 && int.TryParse(yearDigits, out int parsedYear) && parsedYear >= 1 && parsedYear <= 10)
-        {
-            // It's an academic year indicator (e.g., "3" from "3rd Year"), not a calendar year.
-            // Store the current calendar year as enrollment year for the DB record.
-            enrollmentYear = DateTime.UtcNow.Year;
-        }
-
-        // 3. Create the Student entity
-        var student = new Student
-        {
-            ExternalId     = model.StudentIdString,
-            FullName       = model.FullName,
-            Department     = model.Department,
-            EnrollmentYear = enrollmentYear,
-            Email          = string.Empty // Email not collected in the enrollment form currently
-        };
-
-        // 4. If a fingerprint template was captured from the hardware, encrypt and attach it
+        // 3. If a fingerprint template was captured from the hardware, encrypt and attach it
         if (!string.IsNullOrWhiteSpace(model.FingerprintBase64))
         {
             try
             {
-                byte[] rawTemplate = Convert.FromBase64String(model.FingerprintBase64);
+                // Sanitize string to remove any accidental whitespace, newlines, or invalid characters
+                string sanitizedB64 = model.FingerprintBase64.Trim().Replace(" ", "+").Replace("\r", "").Replace("\n", "");
+                
+                // If it's still the old hardcoded mock string from browser cache, manually override it to avoid crash
+                if (sanitizedB64 == "MOCKED_BASE64_FINGERPRINT_DATA_==") 
+                {
+                    sanitizedB64 = "TW9ja0ZpbmdlcnByaW50RGF0YQ==";
+                }
+
+                byte[] rawTemplate = Convert.FromBase64String(sanitizedB64);
                 byte[] encryptedTemplate = _encryptionService.Encrypt(rawTemplate);
 
-                student.Fingerprint = new Fingerprint
+                if (studentToSave.Fingerprint != null)
                 {
-                    EncryptedTemplate = encryptedTemplate,
-                    EnrollmentDate    = DateTime.UtcNow
-                };
+                    // Overwrite existing template if they are re-enrolling their finger
+                    studentToSave.Fingerprint.EncryptedTemplate = encryptedTemplate;
+                    studentToSave.Fingerprint.EnrollmentDate = DateTime.UtcNow;
+                }
+                else
+                {
+                    // Create new fingerprint
+                    studentToSave.Fingerprint = new Fingerprint
+                    {
+                        EncryptedTemplate = encryptedTemplate,
+                        EnrollmentDate    = DateTime.UtcNow
+                    };
+                }
             }
             catch (FormatException ex)
             {
@@ -82,12 +111,14 @@ public class EnrollmentService : IEnrollmentService
             }
         }
 
-        _dbContext.Students.Add(student);
-
         try
         {
             await _dbContext.SaveChangesAsync();
-            _logger.LogInformation("Student enrolled successfully: ExternalId='{ExternalId}', Name='{FullName}'.", student.ExternalId, student.FullName);
+            _logger.LogInformation("Student enrolled successfully: ExternalId='{ExternalId}', Name='{FullName}'.", studentToSave.ExternalId, studentToSave.FullName);
+
+            // Automatically check the student in if there is an active lecture session
+            await _attendanceService.ProcessCheckInAsync(studentToSave.ExternalId, DateTime.Now);
+
             return (true, null);
         }
         catch (DbUpdateException ex)

@@ -85,6 +85,27 @@
                             <input asp-for="EnrollmentYear" class="form-control" />
                             <span asp-validation-for="EnrollmentYear" class="text-danger small"></span>
                         </div>
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label fw-bold text-muted">Course Enrollments</label>
+                            <div class="border rounded p-2" style="max-height: 120px; overflow-y: auto; background-color: #f8f9fa;">
+                                @if (Model.AvailableCourses != null && Model.AvailableCourses.Any())
+                                {
+                                    foreach (var course in Model.AvailableCourses)
+                                    {
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="SelectedCourseIds" value="@course.Value" @(Model.SelectedCourseIds.Contains(int.Parse(course.Value)) ? "checked" : "") id="course_@course.Value">
+                                            <label class="form-check-label small" for="course_@course.Value">
+                                                @course.Text
+                                            </label>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="text-muted small">No courses available in the system.</span>
+                                }
+                            </div>
+                        </div>
                     </div>
 
                     <div class="border-top pt-3 d-flex gap-2">
@@ -99,5 +120,6 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <partial name="_ToastNotifications" />
 </body>
 </html>

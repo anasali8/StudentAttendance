@@ -46,13 +46,7 @@
 
             <div class="card border-0 shadow-sm mb-4 text-start">
                 <div class="card-body p-4">
-                    @if (TempData["SuccessMessage"] != null)
-                    {
-                        <div class="alert alert-success alert-dismissible fade show small" role="alert">
-                            <i class="bi bi-check-circle-fill me-1"></i> @TempData["SuccessMessage"]
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    }
+        <!-- Alerts handled by SweetAlert -->
 
                     <form asp-action="StartSession" method="post">
                         <input type="hidden" name="teacherId" value="@Model.TeacherId" />
@@ -90,5 +84,6 @@
         // Auto-refresh every 60 seconds to check if a session has become active
         setTimeout(() => location.reload(), 60000);
     </script>
+    <partial name="_ToastNotifications" />
 </body>
 </html>

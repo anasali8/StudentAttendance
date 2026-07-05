@@ -163,4 +163,31 @@ public class TeacherDashboardController : Controller
 
         return RedirectToAction(nameof(Index), new { teacherId });
     }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> MarkPresent(int studentId, int sessionId, int teacherId)
+    {
+        var session = await _dbContext.LectureSessions.FindAsync(sessionId);
+        if (session == null || !session.IsActive) return BadRequest();
+
+        var existing = await _dbContext.Attendances
+            .FirstOrDefaultAsync(a => a.StudentId == studentId && a.LectureSessionId == sessionId);
+
+        if (existing == null)
+        {
+            _dbContext.Attendances.Add(new StudentAttendance.Core.Models.Attendance
+            {
+                StudentId = studentId,
+                LectureSessionId = sessionId,
+                Timestamp = DateTime.Now,
+                LatenessClassification = Core.Enums.LatenessClassification.OnTime, // Manual override defaults to OnTime
+                IsManualOverride = true
+            });
+            await _dbContext.SaveChangesAsync();
+            TempData["SuccessMessage"] = "Student manually marked as present.";
+        }
+
+        return RedirectToAction(nameof(Index), new { teacherId });
+    }
 }

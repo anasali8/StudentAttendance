@@ -33,4 +33,9 @@ public class StudentFormViewModel
     [Display(Name = "Enrollment Year")]
     [Range(2000, 2100)]
     public int EnrollmentYear { get; set; } = DateTime.Now.Year;
+
+    [Display(Name = "Enrolled Courses")]
+    public List<int> SelectedCourseIds { get; set; } = new List<int>();
+
+    public List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> AvailableCourses { get; set; } = new List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
 }

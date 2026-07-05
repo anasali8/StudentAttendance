@@ -37,10 +37,7 @@
         <div class="enrollment-box">
             <h4 class="page-title">Student Fingerprint Enrollment</h4>
             
-            @if (TempData["SuccessMessage"] != null)
-            {
-                <div class="alert alert-success">@TempData["SuccessMessage"]</div>
-            }
+            <partial name="_ToastNotifications" />
 
             <form asp-action="Index" method="post" id="enrollmentForm">
                 <input type="hidden" asp-for="FingerprintBase64" id="fingerprintData" />
@@ -84,10 +81,13 @@
                     <!-- Right: Fingerprint Area -->
                     <div class="col-md-5">
                         <div class="fingerprint-area">
-                            <div class="fingerprint-icon-circle">
+                            <div class="fingerprint-icon-circle" title="Click to sync fingerprint from ZKTeco device" style="cursor: pointer;">
                                 <i class="bi bi-fingerprint"></i>
                             </div>
-                            <div class="text-primary fw-bold mb-4">Place Finger Here</div>
+                            <div class="text-primary fw-bold mb-2">Pull Fingerprint from Device</div>
+                            <div class="small text-muted mb-4 px-3 text-center">
+                                Have the student enroll on the physical ZKTeco machine first. Then, click the icon above to sync their template to the database.
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -95,7 +95,7 @@
                 <div class="row mt-2">
                     <div class="col-md-8 offset-md-2">
                         <div class="status-box" id="scannerStatus">
-                            <span class="text-success fw-bold">✓ Scanner Ready</span> <span class="text-muted">— Waiting for finger placement...</span>
+                            <span class="text-success fw-bold">✓ Ready</span> <span class="text-muted">— Waiting to sync with device...</span>
                         </div>
                         
                         <div class="mt-3">
