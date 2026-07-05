@@ -13,7 +13,7 @@
     <title>@ViewData["Title"]</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="~/css/attendance-custom.css" />
+    <link rel="stylesheet" href="~/css/attendance-custom.css" asp-append-version="true" />
     <style>
         /* Specific adjustments for Reports view to match Figure 9 if needed, 
            ideally this should be moved to attendance-custom.css later, 
@@ -23,10 +23,7 @@
 </head>
 <body>
 
-    <!-- Top Navbar -->
-    <div class="top-nav top-nav-alt d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">Fingerprint Attendance System &mdash; Attendance Reports</h5>
-    </div>
+<div class="app-wrapper">
 
     <!-- Sidebar -->
     <div class="sidebar">
@@ -37,12 +34,24 @@
         <a asp-controller="Admin" asp-action="Index" class="sidebar-link">Admin</a>
     </div>
 
+    <div class="app-body">
+
+    <!-- Top Navbar -->
+    <div class="top-nav top-nav-alt d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center gap-2">
+            <button class="sidebar-toggle-btn" id="sidebarToggle" title="Toggle Menu">
+                <i class="bi bi-list"></i>
+            </button>
+            <h5 class="mb-0">Fingerprint Attendance System &mdash; Attendance Reports</h5>
+        </div>
+    </div>
+
     <!-- Main Content -->
     <div class="main-content">
         
         <!-- Filter Bar -->
-        <div class="d-flex align-items-center bg-white p-3 mb-4 shadow-sm rounded-1 border">
-            <div class="d-flex align-items-center me-4">
+        <div class="d-flex align-items-center flex-wrap bg-white p-3 mb-4 shadow-sm rounded-1 border gap-3">
+            <div class="d-flex align-items-center">
                 <label class="fw-bold text-muted me-2 mb-0">Course:</label>
                 <select class="form-select form-select-sm" style="width: auto;">
                     <option selected>@Model.SelectedCourse</option>
@@ -95,8 +104,8 @@
             <div class="card-header bg-white border-bottom-0 pt-3">
                 <div class="section-header mb-0">Per-Student Attendance Summary &mdash; @Model.SelectedPeriod</div>
             </div>
-            <div class="card-body p-0">
-                <table class="table table-custom mb-0 table-hover">
+            <div class="card-body p-0 table-responsive">
+                <table class="table table-custom mb-0 table-hover text-nowrap">
                     <thead>
                         <tr>
                             <th class="ps-4">Student Name</th>
@@ -153,5 +162,8 @@
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/Scripts/Attendance/Reports/reports.js"></script>
+    <partial name="_SidebarToggle" />
+    </div><!-- /.app-body -->
+</div><!-- /.app-wrapper -->
 </body>
 </html>

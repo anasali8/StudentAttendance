@@ -13,15 +13,11 @@
     <title>@ViewData["Title"]</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="~/css/attendance-custom.css" />
+    <link rel="stylesheet" href="~/css/attendance-custom.css" asp-append-version="true" />
 </head>
 <body>
 
-    <!-- Top Navbar -->
-    <div class="top-nav top-nav-alt d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">Fingerprint Attendance System</h5>
-        <span class="text-light opacity-75">Admin Panel</span>
-    </div>
+<div class="app-wrapper">
 
     <!-- Sidebar -->
     <div class="sidebar">
@@ -30,6 +26,19 @@
         <a asp-controller="Students" asp-action="Index" class="sidebar-link">Students</a>
         <a asp-controller="StudentEnrollment" asp-action="Index" class="sidebar-link active-alt">Fingerprints</a>
         <a asp-controller="Admin" asp-action="Index" class="sidebar-link">Admin</a>
+    </div>
+
+    <div class="app-body">
+
+    <!-- Top Navbar -->
+    <div class="top-nav top-nav-alt d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center gap-2">
+            <button class="sidebar-toggle-btn" id="sidebarToggle" title="Toggle Menu">
+                <i class="bi bi-list"></i>
+            </button>
+            <h5 class="mb-0">Fingerprint Attendance System</h5>
+        </div>
+        <span class="text-light opacity-75">Admin Panel</span>
     </div>
 
     <!-- Main Content -->
@@ -46,7 +55,7 @@
                     <!-- Left: Form Fields -->
                     <div class="col-md-7">
                         <div class="mb-3 row">
-                            <label asp-for="StudentIdString" class="col-sm-3 col-form-label form-label text-end">Student ID:</label>
+                            <label asp-for="StudentIdString" class="col-sm-3 col-form-label form-label text-sm-end">Student ID:</label>
                             <div class="col-sm-8">
                                 <input asp-for="StudentIdString" class="form-control" placeholder="e.g., STU-2025-0412" />
                                 <span asp-validation-for="StudentIdString" class="text-danger small"></span>
@@ -54,7 +63,7 @@
                         </div>
 
                         <div class="mb-3 row">
-                            <label asp-for="FullName" class="col-sm-3 col-form-label form-label text-end">Full Name:</label>
+                            <label asp-for="FullName" class="col-sm-3 col-form-label form-label text-sm-end">Full Name:</label>
                             <div class="col-sm-8">
                                 <input asp-for="FullName" class="form-control" placeholder="e.g., Mohammed Al-Rashidi" />
                                 <span asp-validation-for="FullName" class="text-danger small"></span>
@@ -62,7 +71,7 @@
                         </div>
 
                         <div class="mb-3 row">
-                            <label asp-for="Department" class="col-sm-3 col-form-label form-label text-end">Department:</label>
+                            <label asp-for="Department" class="col-sm-3 col-form-label form-label text-sm-end">Department:</label>
                             <div class="col-sm-8">
                                 <input asp-for="Department" class="form-control" placeholder="e.g., Information Systems" />
                                 <span asp-validation-for="Department" class="text-danger small"></span>
@@ -70,7 +79,7 @@
                         </div>
 
                         <div class="mb-4 row">
-                            <label asp-for="Year" class="col-sm-3 col-form-label form-label text-end">Year:</label>
+                            <label asp-for="Year" class="col-sm-3 col-form-label form-label text-sm-end">Year:</label>
                             <div class="col-sm-8">
                                 <input asp-for="Year" class="form-control" placeholder="e.g., 3rd Year" />
                                 <span asp-validation-for="Year" class="text-danger small"></span>
@@ -111,5 +120,8 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
     <script src="~/Scripts/Attendance/StudentEnrollment/enrollment.js"></script>
+    <partial name="_SidebarToggle" />
+    </div><!-- /.app-body -->
+</div><!-- /.app-wrapper -->
 </body>
 </html>

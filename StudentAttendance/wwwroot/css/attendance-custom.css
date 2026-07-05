@@ -28,9 +28,13 @@ body {
 /* Sidebar */
 .sidebar { 
     background-color: #1f2937; 
-    min-height: calc(100vh - 56px); 
+    min-height: 100vh; 
     width: 250px; 
-    position: fixed; 
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
+    height: 100vh;
+    overflow-y: auto;
 }
 .sidebar-link { 
     color: #9ca3af; 
@@ -55,11 +59,9 @@ body {
 }
 
 .main-content { 
-    margin-left: 250px; 
     padding: 20px; 
 }
 .main-content-padded {
-    margin-left: 250px; 
     padding: 30px;
 }
 
@@ -243,3 +245,124 @@ body {
     margin-left: 10px;
 }
 .btn-clear:hover { background-color: #d1d5db; }
+
+/* ========================================
+   RESPONSIVE LAYOUT — Hamburger Sidebar
+   ======================================== */
+
+/* Wrap that holds sidebar + content side by side on desktop */
+.app-wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* On desktop the sidebar is fixed on the left */
+.sidebar {
+    flex-shrink: 0;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    transition: transform 0.3s ease;
+    z-index: 1040;
+}
+
+/* The main area (top-nav + content) grows to fill remaining space */
+.app-body {
+    flex: 1;
+    min-width: 0; /* prevents flex overflow */
+    display: flex;
+    flex-direction: column;
+}
+
+/* Hamburger button — hidden on desktop */
+.sidebar-toggle-btn {
+    display: none;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0 8px;
+    line-height: 1;
+}
+
+/* Dark overlay when sidebar is open on mobile */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 1030;
+}
+.sidebar-overlay.active {
+    display: block;
+}
+
+/* ---- Mobile breakpoint ---- */
+@media (max-width: 991.98px) {
+
+    /* Sidebar slides in from the left, hidden by default */
+    .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        transform: translateX(-100%);
+        width: 250px !important;
+        min-height: 100vh;
+        z-index: 1040;
+    }
+
+    /* When the sidebar is open, slide it into view */
+    .sidebar.sidebar-open {
+        transform: translateX(0);
+    }
+
+    /* Main content takes full width — no left margin */
+    .main-content,
+    .main-content-padded {
+        margin-left: 0 !important;
+    }
+
+    /* Show the hamburger button */
+    .sidebar-toggle-btn {
+        display: inline-block;
+    }
+
+    /* Top nav adjustments */
+    .top-nav, .top-nav-alt {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    /* Stack KPI cards 2-across on mobile */
+    .kpi-card {
+        margin-bottom: 15px;
+    }
+
+    /* Page title font scale */
+    .page-title {
+        font-size: 1.4rem;
+    }
+
+    .fingerprint-box {
+        padding: 20px;
+    }
+
+    /* Ensure the form rows in enrollment stack nicely */
+    .form-group-row {
+        flex-direction: column;
+        align-items: flex-start !important;
+    }
+    .form-group-row .form-label {
+        width: auto;
+        margin-bottom: 4px;
+    }
+    .form-group-row .form-control {
+        width: 100%;
+    }
+
+    /* Admin Enrollment scanner stacks below form */
+    .enrollment-flex {
+        flex-direction: column !important;
+    }
+}
