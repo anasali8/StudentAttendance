@@ -1,0 +1,73 @@
+@{
+    Layout = null;
+    ViewData["Title"] = "Classroom Terminal";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="~/css/attendance-custom.css" />
+</head>
+<body class="bg-light-custom">
+    <div class="top-nav d-flex justify-content-between align-items-center">
+        <h4 class="mb-0">Fingerprint Attendance System</h4>
+        <span class="text-light">Classroom Terminal</span>
+    </div>
+    <div class="sub-nav">
+        Course: Information Systems Design &nbsp;|&nbsp; Instructor: Dr. Ahmed Saleh &nbsp;|&nbsp; 08:00 - 09:30
+    </div>
+
+    <div class="container-fluid mt-4 px-4">
+        <div class="row">
+            <!-- Left Panel (Scan Area) -->
+            <div class="col-md-7 pe-5">
+                <div class="d-flex align-items-center mb-2">
+                    <span class="fs-5 text-muted me-3">Current Time:</span>
+                    <div class="time-display mb-0" id="clock">09:07:42</div>
+                </div>
+
+                <div class="fingerprint-box mb-4 shadow-sm">
+                    <h5 class="fw-bold mb-4">Scan Your Fingerprint</h5>
+                    <i class="bi bi-fingerprint fingerprint-icon mb-3 d-block"></i>
+                    
+                    <form id="manualCheckInForm" asp-action="ManualCheckIn" method="post" class="mt-4" style="max-width: 300px; margin: 0 auto;">
+                        <div class="input-group">
+                            <input type="number" id="studentIdInput" name="studentId" class="form-control" placeholder="Enter Student ID (Fallback)" required />
+                            <button type="submit" class="btn btn-outline-secondary">Enter</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="status-box-terminal mb-4 shadow-sm" id="statusBox">
+                    <div class="fw-bold text-success"><i class="bi bi-check-lg"></i> Scanner Ready</div>
+                    <div class="text-muted small mt-1" id="statusMessage">Waiting for finger placement...</div>
+                </div>
+
+                <div class="d-flex align-items-center">
+                    <label class="fw-bold me-3">Select Course:</label>
+                    <select class="form-select w-auto shadow-sm">
+                        <option>IS Design</option>
+                        <option>Database Systems</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Right Panel (Recent Check-ins) -->
+            <div class="col-md-5">
+                <h5 class="fw-bold mb-3">Recent Check-ins</h5>
+                <div class="checkin-list shadow-sm" id="recentCheckinsContainer">
+                    <!-- Dynamic check-ins will be injected here via SignalR -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
+    <script src="~/Scripts/Attendance/ClassroomTerminal/terminal.js"></script>
+</body>
+</html>

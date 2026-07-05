@@ -1,0 +1,106 @@
+@model StudentAttendance.ViewModels.EnrollmentViewModel
+@{
+    ViewData["Title"] = "Student Fingerprint Enrollment";
+    Layout = null; // Custom layout to match the documentation's specific sidebar style
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Admin Panel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        body { background-color: #f4f6f9; }
+        .sidebar { background-color: #1e293b; min-height: 100vh; color: #fff; }
+        .sidebar-brand { background-color: #1a2233; padding: 15px 20px; font-weight: bold; font-size: 1.1rem; }
+        .nav-link { color: #cbd5e1; padding: 15px 20px; border-radius: 0; }
+        .nav-link:hover, .nav-link.active { background-color: #334155; color: #fff; }
+        .top-navbar { background-color: #253347; color: #cbd5e1; padding: 10px 20px; text-align: right; }
+        .content-area { padding: 30px; }
+        .form-label { font-weight: 600; color: #475569; width: 120px; display: inline-block; }
+        .form-group-row { display: flex; align-items: center; margin-bottom: 15px; }
+        .form-control { border-radius: 2px; border: 1px solid #cbd5e1; width: 300px; }
+        .scanner-box { border: 2px solid #93c5fd; border-radius: 50%; width: 120px; height: 120px; display: flex; align-items: center; justify-content: center; color: #3b82f6; font-size: 3rem; margin-left: 20px; }
+        .status-box { border: 2px solid #86efac; background-color: #f0fdf4; color: #166534; padding: 15px; border-radius: 4px; font-weight: 500; margin-top: 20px; margin-bottom: 20px; width: fit-content; }
+        .btn-primary { background-color: #1e293b; border: none; padding: 8px 25px; border-radius: 3px; }
+        .btn-secondary { background-color: #e2e8f0; color: #475569; border: none; padding: 8px 25px; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <div class="sidebar" style="width: 250px;">
+            <div class="sidebar-brand">Fingerprint Attendance System</div>
+            <div class="nav flex-column mt-3">
+                <a asp-controller="TeacherDashboard" asp-action="Index" class="nav-link">Dashboard</a>
+                <a asp-controller="Reports" asp-action="Index" class="nav-link">Reports</a>
+                <a asp-controller="Students" asp-action="Index" class="nav-link">Students</a>
+                <a asp-controller="Admin" asp-action="Index" class="nav-link active">Admin</a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-grow-1">
+            <div class="top-navbar">Admin Panel</div>
+            
+            <div class="content-area">
+                <h3 class="mb-4 pb-2 border-bottom" style="color: #334155; font-weight:bold;">Student Fingerprint Enrollment</h3>
+                
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+                }
+
+                <form asp-action="Enrollment" method="post" class="bg-white p-4 shadow-sm" style="max-width: 800px;">
+                    <div class="d-flex">
+                        <div>
+                            <div class="form-group-row">
+                                <label asp-for="StudentIdString" class="form-label"></label>
+                                <input asp-for="StudentIdString" class="form-control" placeholder="STU-2025-0412" />
+                            </div>
+                            
+                            <div class="form-group-row">
+                                <label asp-for="FullName" class="form-label"></label>
+                                <input asp-for="FullName" class="form-control" placeholder="Mohammed Al-Rashidi" />
+                            </div>
+                            
+                            <div class="form-group-row">
+                                <label asp-for="Department" class="form-label"></label>
+                                <input asp-for="Department" class="form-control" placeholder="Information Systems" />
+                            </div>
+                            
+                            <div class="form-group-row">
+                                <label asp-for="Year" class="form-label"></label>
+                                <input asp-for="Year" class="form-control" placeholder="3rd Year" />
+                            </div>
+                        </div>
+
+                        <!-- Scanner Visual Area -->
+                        <div class="d-flex flex-column align-items-center ms-5">
+                            <div class="scanner-box">
+                                <i class="bi bi-fingerprint"></i>
+                            </div>
+                            <small class="text-primary fw-bold mt-2">Place Finger Here</small>
+                        </div>
+                    </div>
+
+                    <div class="status-box">
+                        <i class="bi bi-check-lg me-2"></i> Scanner Ready — Waiting for finger placement...
+                    </div>
+
+                    <!-- Hidden input to hold base64 template from the device SDK -->
+                    <input type="hidden" asp-for="FingerprintBase64" id="fingerprintData" />
+
+                    <div class="d-flex gap-3">
+                        <button type="submit" class="btn btn-primary">Enroll Fingerprint</button>
+                        <button type="reset" class="btn btn-secondary">Clear Form</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

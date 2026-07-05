@@ -1,0 +1,245 @@
+/* Global and Layout */
+body { 
+    background-color: #f3f4f6; 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    margin: 0; 
+}
+.bg-light-custom { background-color: #f8f9fa !important; }
+
+/* Navigation */
+.top-nav { 
+    background-color: #1f2937; 
+    color: white; 
+    padding: 15px 20px; 
+    border-bottom: 1px solid #374151; 
+}
+.top-nav-alt { /* Used in Admin panel */
+    background-color: #2b3954; 
+    color: white; 
+    padding: 15px 20px; 
+}
+.sub-nav { 
+    background-color: #374151; 
+    color: #d1d5db; 
+    padding: 10px 20px; 
+    font-size: 0.9rem; 
+}
+
+/* Sidebar */
+.sidebar { 
+    background-color: #1f2937; 
+    min-height: calc(100vh - 56px); 
+    width: 250px; 
+    position: fixed; 
+}
+.sidebar-link { 
+    color: #9ca3af; 
+    text-decoration: none; 
+    padding: 15px 20px; 
+    display: block; 
+    border-bottom: 1px solid #374151; 
+}
+.sidebar-link:hover { 
+    color: white; 
+    background-color: #374151; 
+}
+.sidebar-link.active { 
+    color: white; 
+    background-color: #3b82f6; 
+    border-left: 4px solid #60a5fa; 
+}
+.sidebar-link.active-alt { /* Used in Teacher Dashboard */
+    color: white; 
+    background-color: #374151; 
+    border-left: 4px solid #3b82f6; 
+}
+
+.main-content { 
+    margin-left: 250px; 
+    padding: 20px; 
+}
+.main-content-padded {
+    margin-left: 250px; 
+    padding: 30px;
+}
+
+/* Classroom Terminal Components */
+.fingerprint-box { 
+    border: 2px solid #e5e7eb; 
+    border-radius: 8px; 
+    padding: 40px; 
+    text-align: center; 
+    background-color: white; 
+}
+.fingerprint-icon { 
+    font-size: 100px; 
+    color: #3b82f6; 
+}
+.checkin-list { 
+    background-color: white; 
+    border: 1px solid #e5e7eb; 
+    border-radius: 8px; 
+    overflow: hidden; 
+}
+.checkin-item { 
+    padding: 10px 15px; 
+    border-bottom: 1px solid #e5e7eb; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+}
+.checkin-item:last-child { border-bottom: none; }
+.time-display { 
+    font-size: 2.5rem; 
+    font-weight: bold; 
+    color: #1f2937; 
+    margin-bottom: 20px; 
+}
+
+/* Teacher Dashboard Components */
+.kpi-card { 
+    background: white; 
+    text-align: center; 
+    padding: 15px; 
+    border-radius: 4px; 
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+}
+.kpi-title { 
+    font-size: 0.85rem; 
+    color: white; 
+    padding: 5px; 
+    border-radius: 4px 4px 0 0; 
+    margin: -15px -15px 15px -15px; 
+    font-weight: bold; 
+}
+.kpi-value { font-size: 2.5rem; font-weight: bold; }
+
+.kpi-total .kpi-title { background-color: #1f2937; }
+.kpi-total .kpi-value { color: #1f2937; }
+.kpi-present .kpi-title { background-color: #4ade80; }
+.kpi-present .kpi-value { color: #22c55e; }
+.kpi-late .kpi-title { background-color: #f97316; }
+.kpi-late .kpi-value { color: #ea580c; }
+.kpi-absent .kpi-title { background-color: #ef4444; }
+.kpi-absent .kpi-value { color: #dc2626; }
+
+.table-custom th { 
+    background-color: #f9fafb; 
+    font-size: 0.85rem; 
+    color: #6b7280; 
+    border-bottom: 1px solid #e5e7eb; 
+}
+.table-custom td { 
+    font-size: 0.9rem; 
+    vertical-align: middle; 
+    border-bottom: 1px solid #e5e7eb; 
+}
+.status-badge { 
+    font-size: 0.8rem; 
+    padding: 4px 8px; 
+    border-radius: 4px; 
+}
+.status-ontime { color: #166534; background-color: #dcfce7; }
+.status-late { color: #9a3412; background-color: #ffedd5; }
+.status-absent { color: #991b1b; background-color: #fee2e2; }
+
+.section-header { 
+    font-weight: bold; 
+    color: #1f2937; 
+    margin-bottom: 15px; 
+    font-size: 1.1rem; 
+}
+.risk-box { border: 1px solid #fca5a5; border-radius: 4px; background: white; }
+.risk-header { 
+    background-color: #c2410c; 
+    color: white; 
+    padding: 8px 15px; 
+    font-size: 0.9rem; 
+    font-weight: bold; 
+}
+.risk-item { 
+    padding: 10px 15px; 
+    border-bottom: 1px solid #f3f4f6; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+}
+.risk-item:last-child { border-bottom: none; }
+.risk-percent { font-weight: bold; color: #c2410c; }
+
+/* Student Enrollment Components */
+.enrollment-box { 
+    background: white; 
+    padding: 30px; 
+    border-radius: 4px; 
+    border-top: 2px solid #e5e7eb; 
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+}
+.page-title { 
+    color: #1f2937; 
+    font-weight: bold; 
+    margin-bottom: 30px; 
+    border-bottom: 2px solid #f3f4f6; 
+    padding-bottom: 15px; 
+}
+
+.form-label { font-weight: 600; color: #4b5563; font-size: 0.9rem; }
+.form-control { border-color: #d1d5db; }
+
+.fingerprint-area { text-align: center; margin-top: 10px; }
+.fingerprint-icon-circle { 
+    width: 140px; 
+    height: 140px; 
+    border: 2px solid #bfdbfe; 
+    border-radius: 50%; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    margin: 0 auto 15px auto;
+    color: #60a5fa; 
+    background-color: #eff6ff;
+}
+.fingerprint-icon-circle i { font-size: 80px; }
+
+/* Shared Status Box */
+.status-box { 
+    border: 1px solid #86efac; 
+    border-left-width: 5px; 
+    background-color: #f0fdf4; 
+    padding: 15px; 
+    border-radius: 4px; 
+    display: inline-block; 
+    min-width: 100%; 
+    margin-bottom: 20px;
+}
+.status-box.success { 
+    border-color: #10b981; 
+    background-color: #d1fae5; 
+    color: #065f46; 
+}
+.status-box-terminal {
+    border: 1px solid #22c55e; 
+    border-left: 5px solid #22c55e; 
+    background-color: #f0fdf4; 
+    padding: 15px; 
+    border-radius: 4px; 
+}
+
+/* Enrollment Buttons */
+.btn-enroll { 
+    background-color: #1f2937; 
+    color: white; 
+    border: none; 
+    padding: 10px 25px; 
+    font-weight: 600; 
+}
+.btn-enroll:hover { background-color: #111827; color: white; }
+.btn-clear { 
+    background-color: #e5e7eb; 
+    color: #4b5563; 
+    border: none; 
+    padding: 10px 25px; 
+    font-weight: 600; 
+    margin-left: 10px;
+}
+.btn-clear:hover { background-color: #d1d5db; }

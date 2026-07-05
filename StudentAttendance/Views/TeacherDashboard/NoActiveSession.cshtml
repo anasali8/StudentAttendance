@@ -1,0 +1,87 @@
+@{
+    Layout = null;
+    ViewData["Title"] = "No Active Session";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="~/css/attendance-custom.css" />
+</head>
+<body>
+
+    <!-- Top Navbar -->
+    <div class="top-nav d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Fingerprint Attendance System &mdash; Teacher Dashboard</h5>
+        <span class="text-light small" id="current-time"></span>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <a asp-controller="TeacherDashboard" asp-action="Index" class="sidebar-link active-alt">Dashboard</a>
+        <a asp-controller="Reports" asp-action="Index" class="sidebar-link">Reports</a>
+        <a asp-controller="Students" asp-action="Index" class="sidebar-link">Students</a>
+        <a asp-controller="Admin" asp-action="Index" class="sidebar-link">Admin</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content d-flex align-items-center justify-content-center" style="min-height: calc(100vh - 56px);">
+        <div class="text-center" style="max-width: 480px;">
+
+            <div class="mb-4" style="font-size: 5rem; color: #9ca3af;">
+                <i class="bi bi-calendar-x"></i>
+            </div>
+
+            <h2 class="fw-bold text-dark mb-2">No Active Session</h2>
+            <p class="text-muted mb-4">
+                There is currently no active lecture session scheduled for your courses.
+                Sessions become active when a class starts within its scheduled time window.
+            </p>
+
+            <div class="card border-0 shadow-sm mb-4" style="background:#f9fafb; border-radius: 8px;">
+                <div class="card-body py-3 px-4 text-start">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="bi bi-info-circle text-primary me-2"></i>
+                        <span class="fw-bold text-dark small">What does this mean?</span>
+                    </div>
+                    <ul class="text-muted small mb-0 ps-3">
+                        <li>No lecture session is currently marked as active in the system.</li>
+                        <li>Sessions open 30 minutes before their scheduled start time.</li>
+                        <li>Contact your administrator if a session should be active now.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 justify-content-center">
+                <a asp-controller="TeacherDashboard" asp-action="Index"
+                   class="btn btn-sm btn-outline-secondary px-4">
+                    <i class="bi bi-arrow-clockwise me-1"></i> Refresh
+                </a>
+                <a asp-controller="Admin" asp-action="Index"
+                   class="btn btn-sm px-4" style="background:#1f2937; color:white;">
+                    <i class="bi bi-gear me-1"></i> Admin Panel
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Live clock
+        function updateClock() {
+            const el = document.getElementById('current-time');
+            if (el) el.textContent = new Date().toLocaleTimeString('en-GB', { hour12: false });
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Auto-refresh every 60 seconds to check if a session has become active
+        setTimeout(() => location.reload(), 60000);
+    </script>
+</body>
+</html>

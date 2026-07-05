@@ -1,0 +1,156 @@
+@model StudentAttendance.ViewModels.ReportViewModel
+
+@{
+    Layout = null;
+    ViewData["Title"] = "Attendance Reports";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="~/css/attendance-custom.css" />
+    <style>
+        /* Specific adjustments for Reports view to match Figure 9 if needed, 
+           ideally this should be moved to attendance-custom.css later, 
+           but per rules we should put it in attendance-custom.css. 
+           I will use Bootstrap utility classes mostly. */
+    </style>
+</head>
+<body>
+
+    <!-- Top Navbar -->
+    <div class="top-nav top-nav-alt d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Fingerprint Attendance System &mdash; Attendance Reports</h5>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <a asp-controller="TeacherDashboard" asp-action="Index" class="sidebar-link">Dashboard</a>
+        <a asp-controller="Reports" asp-action="Index" class="sidebar-link active-alt">Reports</a>
+        <a asp-controller="Students" asp-action="Index" class="sidebar-link">Students</a>
+        <a asp-controller="Admin" asp-action="Index" class="sidebar-link">Admin</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        
+        <!-- Filter Bar -->
+        <div class="d-flex align-items-center bg-white p-3 mb-4 shadow-sm rounded-1 border">
+            <div class="d-flex align-items-center me-4">
+                <label class="fw-bold text-muted me-2 mb-0">Course:</label>
+                <select class="form-select form-select-sm" style="width: auto;">
+                    <option selected>@Model.SelectedCourse</option>
+                    <option>Database Systems</option>
+                </select>
+            </div>
+            
+            <div class="d-flex align-items-center me-4">
+                <label class="fw-bold text-muted me-2 mb-0">Period:</label>
+                <select class="form-select form-select-sm" style="width: auto;">
+                    <option selected>@Model.SelectedPeriod</option>
+                    <option>Week 5</option>
+                    <option>Week 7</option>
+                </select>
+            </div>
+            
+            <button class="btn btn-dark btn-sm px-4 fw-bold" id="btnGenerateReport">Generate Report</button>
+        </div>
+
+        <!-- KPI Cards Row -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card shadow-sm border-0 text-center py-3">
+                    <div class="text-muted small fw-bold mb-1">Attendance Rate</div>
+                    <div class="display-6 fw-bold" style="color: #10b981;">@Model.AttendanceRate%</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card shadow-sm border-0 text-center py-3">
+                    <div class="text-muted small fw-bold mb-1">On Time</div>
+                    <div class="display-6 fw-bold" style="color: #3b82f6;">@Model.OnTimeRate%</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card shadow-sm border-0 text-center py-3">
+                    <div class="text-muted small fw-bold mb-1">Late (Any)</div>
+                    <div class="display-6 fw-bold" style="color: #f97316;">@Model.LateRate%</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card shadow-sm border-0 text-center py-3">
+                    <div class="text-muted small fw-bold mb-1">Absent</div>
+                    <div class="display-6 fw-bold" style="color: #ef4444;">@Model.AbsentRate%</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reports Table -->
+        <div class="card shadow-sm mb-4 border-0">
+            <div class="card-header bg-white border-bottom-0 pt-3">
+                <div class="section-header mb-0">Per-Student Attendance Summary &mdash; @Model.SelectedPeriod</div>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-custom mb-0 table-hover">
+                    <thead>
+                        <tr>
+                            <th class="ps-4">Student Name</th>
+                            <th class="text-center">Present</th>
+                            <th class="text-center">Late (T1)</th>
+                            <th class="text-center">Late (T2)</th>
+                            <th class="text-center">Late (T3)</th>
+                            <th class="text-center">Absent</th>
+                            <th class="text-center">Rate</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var student in Model.Students)
+                        {
+                            <tr>
+                                <td class="ps-4 text-muted fw-bold">@student.StudentName</td>
+                                <td class="text-center">@student.PresentCount</td>
+                                <td class="text-center">@student.LateTier1Count</td>
+                                <td class="text-center">@student.LateTier2Count</td>
+                                <td class="text-center">@student.LateTier3Count</td>
+                                <td class="text-center">@student.AbsentCount</td>
+                                <td class="text-center">
+                                    @if (student.RatePercentage == "100%")
+                                    {
+                                        <span class="text-success fw-bold">@student.RatePercentage</span>
+                                    }
+                                    else if (student.RatePercentage.StartsWith("8"))
+                                    {
+                                        <span class="text-primary fw-bold">@student.RatePercentage</span>
+                                    }
+                                    else if (student.RatePercentage.StartsWith("6") || student.RatePercentage.StartsWith("7"))
+                                    {
+                                        <span class="text-warning fw-bold">@student.RatePercentage</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-danger fw-bold">@student.RatePercentage</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="d-flex gap-2">
+            <button class="btn btn-dark px-4 fw-bold" id="btnExportExcel">Export to Excel</button>
+            <button class="btn btn-light border px-4 fw-bold text-muted" id="btnExportPdf">Export PDF</button>
+            <button class="btn btn-light border px-4 fw-bold text-muted" id="btnPrintReport">Print Report</button>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/Scripts/Attendance/Reports/reports.js"></script>
+</body>
+</html>
