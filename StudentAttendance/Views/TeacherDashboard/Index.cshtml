@@ -20,7 +20,16 @@
     <!-- Top Navbar -->
     <div class="top-nav d-flex justify-content-between align-items-center">
         <h5 class="mb-0">Fingerprint Attendance System &mdash; Teacher Dashboard</h5>
-        <span>@Model.CourseName (@Model.CourseCode)</span>
+        <div class="d-flex align-items-center gap-3">
+            <span class="fw-bold">@Model.CourseName (@Model.CourseCode)</span>
+            <form asp-action="EndSession" method="post" onsubmit="return confirm('Are you sure you want to end this session? Any student who hasn\'t checked in will be marked Absent.');">
+                <input type="hidden" name="sessionId" value="@Model.ActiveLectureSessionId" />
+                <input type="hidden" name="teacherId" value="2" />
+                <button type="submit" class="btn btn-sm btn-danger fw-bold shadow-sm">
+                    <i class="bi bi-stop-circle me-1"></i> End Session
+                </button>
+            </form>
+        </div>
     </div>
 
     <!-- Sidebar -->
@@ -28,6 +37,7 @@
         <a asp-controller="TeacherDashboard" asp-action="Index" class="sidebar-link active-alt">Dashboard</a>
         <a asp-controller="Reports" asp-action="Index" class="sidebar-link">Reports</a>
         <a asp-controller="Students" asp-action="Index" class="sidebar-link">Students</a>
+        <a asp-controller="StudentEnrollment" asp-action="Index" class="sidebar-link">Fingerprints</a>
         <a asp-controller="Admin" asp-action="Index" class="sidebar-link">Admin</a>
     </div>
 
@@ -36,6 +46,14 @@
         
         <!-- Live Notification Banner -->
         <div id="signalr-notification" class="alert py-2 px-3 mb-3 small" style="display:none;" role="alert"></div>
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show small" role="alert">
+                <i class="bi bi-check-circle-fill me-1"></i> @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
 
         <!-- KPI Cards -->
         <div class="row mb-4">

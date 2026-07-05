@@ -1,3 +1,4 @@
+@model StudentAttendance.ViewModels.NoActiveSessionViewModel
 @{
     Layout = null;
     ViewData["Title"] = "No Active Session";
@@ -26,46 +27,52 @@
         <a asp-controller="TeacherDashboard" asp-action="Index" class="sidebar-link active-alt">Dashboard</a>
         <a asp-controller="Reports" asp-action="Index" class="sidebar-link">Reports</a>
         <a asp-controller="Students" asp-action="Index" class="sidebar-link">Students</a>
+        <a asp-controller="StudentEnrollment" asp-action="Index" class="sidebar-link">Fingerprints</a>
         <a asp-controller="Admin" asp-action="Index" class="sidebar-link">Admin</a>
     </div>
 
     <!-- Main Content -->
     <div class="main-content d-flex align-items-center justify-content-center" style="min-height: calc(100vh - 56px);">
-        <div class="text-center" style="max-width: 480px;">
+        <div class="text-center" style="max-width: 480px; width: 100%;">
 
-            <div class="mb-4" style="font-size: 5rem; color: #9ca3af;">
-                <i class="bi bi-calendar-x"></i>
+            <div class="mb-4" style="font-size: 4rem; color: #9ca3af;">
+                <i class="bi bi-calendar-check"></i>
             </div>
 
-            <h2 class="fw-bold text-dark mb-2">No Active Session</h2>
+            <h3 class="fw-bold text-dark mb-2">Ready to Start Class?</h3>
             <p class="text-muted mb-4">
-                There is currently no active lecture session scheduled for your courses.
-                Sessions become active when a class starts within its scheduled time window.
+                Select a course below to immediately open a new lecture session and begin tracking attendance.
             </p>
 
-            <div class="card border-0 shadow-sm mb-4" style="background:#f9fafb; border-radius: 8px;">
-                <div class="card-body py-3 px-4 text-start">
-                    <div class="d-flex align-items-center mb-2">
-                        <i class="bi bi-info-circle text-primary me-2"></i>
-                        <span class="fw-bold text-dark small">What does this mean?</span>
-                    </div>
-                    <ul class="text-muted small mb-0 ps-3">
-                        <li>No lecture session is currently marked as active in the system.</li>
-                        <li>Sessions open 30 minutes before their scheduled start time.</li>
-                        <li>Contact your administrator if a session should be active now.</li>
-                    </ul>
-                </div>
-            </div>
+            <div class="card border-0 shadow-sm mb-4 text-start">
+                <div class="card-body p-4">
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show small" role="alert">
+                            <i class="bi bi-check-circle-fill me-1"></i> @TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
 
-            <div class="d-flex gap-2 justify-content-center">
-                <a asp-controller="TeacherDashboard" asp-action="Index"
-                   class="btn btn-sm btn-outline-secondary px-4">
-                    <i class="bi bi-arrow-clockwise me-1"></i> Refresh
-                </a>
-                <a asp-controller="Admin" asp-action="Index"
-                   class="btn btn-sm px-4" style="background:#1f2937; color:white;">
-                    <i class="bi bi-gear me-1"></i> Admin Panel
-                </a>
+                    <form asp-action="StartSession" method="post">
+                        <input type="hidden" name="teacherId" value="@Model.TeacherId" />
+                        
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-muted small">Select Course</label>
+                            <select name="courseId" class="form-select" required>
+                                <option value="">-- Choose a course --</option>
+                                @foreach (var course in Model.TeacherCourses)
+                                {
+                                    <option value="@course.CourseId">@course.CourseCode - @course.CourseName</option>
+                                }
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-dark w-100 fw-bold py-2">
+                            <i class="bi bi-play-circle-fill me-2"></i> Start Lecture Session
+                        </button>
+                    </form>
+                </div>
             </div>
 
         </div>

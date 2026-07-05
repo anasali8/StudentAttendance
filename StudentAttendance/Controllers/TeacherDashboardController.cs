@@ -17,7 +17,7 @@ public class TeacherDashboardController : Controller
         _dbContext = dbContext;
     }
 
-    public async Task<IActionResult> Index(int teacherId = 1) // Defaulting to 1 for demonstration
+    public async Task<IActionResult> Index(int teacherId = 2) // Defaulting to 2 (Dr. Smith) for demonstration
     {
         // 1. Find an active lecture session for this teacher
         var activeSession = await _dbContext.LectureSessions
@@ -27,7 +27,23 @@ public class TeacherDashboardController : Controller
 
         if (activeSession == null)
         {
-            return View("NoActiveSession");
+            var courses = await _dbContext.Courses
+                .Where(c => c.TeacherId == teacherId)
+                .Select(c => new CourseItemViewModel
+                {
+                    CourseId = c.Id,
+                    CourseCode = c.CourseCode,
+                    CourseName = c.CourseName
+                })
+                .ToListAsync();
+
+            var noSessionModel = new NoActiveSessionViewModel
+            {
+                TeacherId = teacherId,
+                TeacherCourses = courses
+            };
+
+            return View("NoActiveSession", noSessionModel);
         }
 
         // 2. Gather today's attendance records for this session
@@ -72,5 +88,79 @@ public class TeacherDashboardController : Controller
         }
 
         return View(viewModel);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> StartSession(int teacherId, int courseId)
+    {
+        // Close any existing active session for this teacher
+        var existingActive = await _dbContext.LectureSessions
+            .Include(ls => ls.Course)
+            .Where(ls => ls.IsActive && ls.Course.TeacherId == teacherId)
+            .ToListAsync();
+
+        foreach (var session in existingActive)
+        {
+            session.IsActive = false;
+            session.ScheduledEnd = DateTime.Now;
+        }
+
+        // Create a new active session
+        var newSession = new StudentAttendance.Core.Models.LectureSession
+        {
+            CourseId = courseId,
+            ScheduledStart = DateTime.Now,
+            ScheduledEnd = DateTime.Now.AddHours(2), // Default 2 hours duration
+            IsActive = true
+        };
+
+        _dbContext.LectureSessions.Add(newSession);
+        await _dbContext.SaveChangesAsync();
+
+        TempData["SuccessMessage"] = "Lecture session started successfully!";
+        return RedirectToAction(nameof(Index), new { teacherId });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> EndSession(int sessionId, int teacherId)
+    {
+        var session = await _dbContext.LectureSessions
+            .Include(ls => ls.Course)
+                .ThenInclude(c => c.Students)
+            .FirstOrDefaultAsync(ls => ls.Id == sessionId);
+
+        if (session != null)
+        {
+            session.IsActive = false;
+            session.ScheduledEnd = DateTime.Now;
+
+            // Auto-mark pending students as absent
+            var existingAttendances = await _dbContext.Attendances
+                .Where(a => a.LectureSessionId == sessionId)
+                .Select(a => a.StudentId)
+                .ToListAsync();
+
+            foreach (var student in session.Course.Students)
+            {
+                if (!existingAttendances.Contains(student.Id))
+                {
+                    _dbContext.Attendances.Add(new StudentAttendance.Core.Models.Attendance
+                    {
+                        StudentId = student.Id,
+                        LectureSessionId = sessionId,
+                        Timestamp = null,
+                        LatenessClassification = Core.Enums.LatenessClassification.Absent,
+                        IsManualOverride = false
+                    });
+                }
+            }
+
+            await _dbContext.SaveChangesAsync();
+            TempData["SuccessMessage"] = "Session ended successfully. Missing students were marked as absent.";
+        }
+
+        return RedirectToAction(nameof(Index), new { teacherId });
     }
 }
